@@ -22,7 +22,7 @@ while(1)
 {
 char play = 'x';
 char askToPlay[] = "Do you want to play a game (Y/N)?\n";
-//char goodBye[] = "Goodbye\n";
+char goodBye[] = "Goodbye\n";
 char invalidInputTemplate[] = "Please only insert %i values\n";
 while(play != 'y' && play!= 'n' && play!='Y' && play!='N')
 {
@@ -31,7 +31,12 @@ while(play != 'y' && play!= 'n' && play!='Y' && play!='N')
         fwrite(askToPlay, 1, strlen(askToPlay), stdout); fflush(stdout); //Server Send Client Recieve (1,0)
         while((len=read(0, buf, SEND_BUFFER_SIZE))!=2) //Server Recieve Client Send (0,1)
 	{
-		if(len != 2) 
+		if(strcasecmp(buf, "Joshua\n")==0)
+		{
+			strcpy(buf, "Starting Global Thermonuclear War\n");
+			fwrite(buf, 1, strlen(buf), stdout); fflush(stdout); //(1,0)	
+		}
+		else if(len != 2) 
 		{
 			size_t temp_len = sprintf(buf, invalidInputTemplate, 1); 
 			fwrite(buf, 1, temp_len, stdout); fflush(stdout); //(1,0)
@@ -42,7 +47,7 @@ while(play != 'y' && play!= 'n' && play!='Y' && play!='N')
  
 if (play == 'n' || play=='N') 
 {
-	//fwrite(goodBye, 1, strlen(goodBye), stdout); //(1/0)
+	fwrite(goodBye, 1, strlen(goodBye), stdout); //(1/0)
 	fflush(stdout);
 	exit(1);
 }
@@ -51,9 +56,9 @@ else
 	char gameBuffer[SEND_BUFFER_SIZE];
 	char tempBuffer[SEND_BUFFER_SIZE];
 	int tries = 10;
-	char answer[5];
-	char guess[5];
-	char clue[5];
+	char answer[6]="";
+	char guess[6]="";
+	char clue[6]="";
 	srand(time(NULL));
 	for(int i = 0; i<5; i++)
 	{	
@@ -61,21 +66,27 @@ else
 		answer[i]=temp + '0';
 	}
 	fwrite(answer, 1, strlen(answer), stdout); fflush(stdout);
-	printf("\n");
-	//size_t temp_len = sprintf(gameBuffer, "\nYou have %i tries left\n", tries);
-	//fwrite(gameBuffer, 1, temp_len, stdout); fflush(stdout);
-	fwrite("Lets play\n", 1, strlen("Lets play\n"), stdout); fflush(stdout); //(1,0) 
+	printf("\n"); 
 	bool win = false;
 	while(tries > 0 && !win)
-	{	
+	{
+		if(tries == 10) {
+			size_t temp_len = sprintf(gameBuffer, "Good luck, you have %i tries to solve the puzzle. C = correct, O = right number wrong place, X = incorrect number\n", tries);
+			fwrite(gameBuffer, 1, temp_len, stdout);
+		}	
+		else
+		{
+			size_t temp_len = sprintf(gameBuffer, "%s\nYou have %i tries remaining\n", clue, tries);
+			fwrite(gameBuffer, 1, temp_len, stdout); 
+		}
+		fflush(stdout); //(1/0)
 		char tempBuffer[SEND_BUFFER_SIZE];
-		printf("tries left - %i\n", tries);
-		while((len=read(0, tempBuffer, SEND_BUFFER_SIZE)) != 6)
+		while((len=read(0, tempBuffer, SEND_BUFFER_SIZE)) != 6) //(0,1)
 			{
 				if (len!=6)
 				{
 				size_t temp_len = sprintf(gameBuffer, invalidInputTemplate, 5);
-				fwrite(gameBuffer, 1, temp_len, stdout); fflush(stdout); //(0,1)
+				fwrite(gameBuffer, 1, temp_len, stdout); fflush(stdout); //(1,0)
 				}
 			}	
 		for(int i = 0; i<5; i++)
@@ -106,20 +117,21 @@ else
 			}
 			else clue[i] = 'X';
 		}
-		fwrite(clue, 1, strlen(clue), stdout);
-		printf("\n");
 		tries--;
+		//size_t temp_len = sprintf(gameBuffer, "%s\nYou have %i tries left\n", clue, tries);
+		//fwrite(gameBuffer, 1, temp_len, stdout); fflush(stdout);
 		if(strcmp(clue, "CCCCC") == 0) win=true;
 
 	}
 	if(win) 
 	{
-		printf("Congradulations, you win\n");
+		strcpy(gameBuffer, "Congradulations, you win\n");
 	}
 	else
 	{
-		printf("You lose, the answer was %s\n", answer);
+		sprintf(gameBuffer, "You lose, the answer was %s\n", answer);
 	}
+	fwrite(gameBuffer, 1, strlen(gameBuffer), stdout); fflush(stdout); //(1,0)
 
 }
 
