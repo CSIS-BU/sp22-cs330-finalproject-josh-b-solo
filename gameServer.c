@@ -8,7 +8,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <errno.h>
-
+#include <time.h>
 #define PORT 27568
 #define BUFFER_SIZE 2048
 #define QUEUE_LENGTH 10
@@ -66,17 +66,17 @@ int main()
 			while(1)
 			{
 				char play = 'x';
+				send(new_s, askToPlay, strlen(askToPlay), 0);
 				while(play != 'y' && play != 'n' && play != 'Y' && play != 'N')
 				{
-					send(new_s, askToPlay, strlen(askToPlay), 0);
 					while((len = recv(new_s, buf, sizeof(buf), 0) != 1))
 					{
-						if(strcasecmp(buf, "Joshua\n")==0)
+						if(strncasecmp(buf, "Joshua", len)==0)
 						{
 							strcpy(buf, "Starting Global Thermonuclear War\n");
 							send(new_s, buf, strlen(buf), 0);
 						}
-						else if(len != 1)
+						else
 						{
 							size_t temp_len = sprintf(buf, invalidInputTemplate, 1);
 							send(new_s, buf, temp_len, 0);

@@ -44,15 +44,17 @@ int main()
 		close(s);
 		exit(1);
 	}
-	
+	char goodBye[] = "Goodbye\n";	
 	while(1)
 	{
 		len = recv(s, buf, sizeof(buf), 0);
 		write(1, buf, len);
 		fflush(stdout);
-		if (strcmp(buf, "Goodbye\n") == 0) exit(1);
+		if (strncmp(buf, goodBye, len) == 0) exit(1);
+		else{
 		len = read(0, buf, BUFFER_SIZE);
 		buf[len-1]='\0';
 		send(s, buf, strlen(buf), 0);
+		}
 	}
 }
