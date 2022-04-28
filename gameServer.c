@@ -107,7 +107,7 @@ int main()
 					{
 						if(tries == 10)
 						{
-							size_t temp_len = sprintf(buf, "Good luck, you have %i tries to solve the puzzle. C = correct, 0 = right number wrong place, X = incorrect number\n", tries);
+							size_t temp_len = sprintf(buf, "Good luck, you have %i tries to solve the puzzle. The puzzle consists of 5 random numbers (0-9). You'll get a clue with each attempt. C = correct, O = right number wrong place, X = incorrect number\n", tries);
 							send(new_s, buf, temp_len, 0);
 						}
 						else
@@ -154,11 +154,11 @@ int main()
 					}
 					if(win)
 					{
-						strcpy(buf, "Congratulations, you win\nEnter anything to continue\n");
+						strcpy(buf, "Congratulations, you win\nIf stuck enter anything to continue\n");
 					}
 					else
 					{
-						sprintf(buf, "You lose, the answer was %s\nEnter anything to continue\n", answer);
+						sprintf(buf, "You lose, the answer was %s\nIf stuck enter anything to continue\n", answer);
 					}
 					send(new_s, buf, strlen(buf), 0);
 				}
